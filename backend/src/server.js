@@ -8,4 +8,7 @@ connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
   });
+}).catch(err => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
 });

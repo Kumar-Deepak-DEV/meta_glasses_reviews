@@ -1,18 +1,20 @@
 const Review = require('../models/Review');
 
 exports.getAllReviews = async (query) => {
-  const { page = 1, limit = 10, sortBy = 'date', order = 'desc', search, ratingMin, ratingMax, country, verifiedPurchase, is_positive_review } = query;
+  const { page = 1, limit = 10, sortBy = 'date', order = 'desc', search, rating, ratingMin, ratingMax, country, verifiedPurchase, sentiment } = query;
   
   const filter = {};
-  if (ratingMin || ratingMax) {
+  if (rating && rating !== '') {
+    filter.rating = Number(rating);
+  } else if (ratingMin || ratingMax) {
     filter.rating = {};
     if (ratingMin) filter.rating.$gte = Number(ratingMin);
     if (ratingMax) filter.rating.$lte = Number(ratingMax);
   }
-  if (country) filter.country = { $regex: country, $options: 'i' };
-  if (verifiedPurchase !== undefined) filter.verifiedPurchase = verifiedPurchase === 'true';
-  if (is_positive_review !== undefined) filter.is_positive_review = is_positive_review === '1' || is_positive_review === 'true';
-  if (search) {
+  if (country && country !== '') filter.country = { $regex: country, $options: 'i' };
+  if (verifiedPurchase !== undefined && verifiedPurchase !== '') filter.verifiedPurchase = verifiedPurchase === 'true';
+  if (sentiment !== undefined && sentiment !== '') filter.is_positive_review = sentiment === '1' || sentiment === 'true';
+  if (search && search !== '') {
     filter.$or = [
       { title: { $regex: search, $options: 'i' } },
       { review: { $regex: search, $options: 'i' } },
@@ -31,8 +33,8 @@ exports.getAllReviews = async (query) => {
     pagination: {
       page: Number(page),
       limit: Number(limit),
-      total,
-      pages: Math.ceil(total / Number(limit)),
+      totalCount: total,
+      totalPages: Math.ceil(total / Number(limit)),
     }
   };
 };
@@ -51,4 +53,13 @@ exports.updateReview = async (id, data) => {
 
 exports.deleteReview = async (id) => {
   return await Review.findOneAndDelete({ reviewID: id });
+};
+
+exports.toggleLikeReview = async (id, action) => {
+  const increment = action === 'like' ? 1 : -1;
+  return await Review.findOneAndUpdate(
+    { reviewID: id },
+    { $inc: { helpful_aug: increment } },
+    { new: true, runValidators: true }
+  );
 };

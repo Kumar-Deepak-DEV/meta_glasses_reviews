@@ -8,12 +8,14 @@ const {
   createReview,
   updateReview,
   deleteReview,
+  toggleLikeReview,
 } = require('../controllers/reviewController');
 
 const router = Router();
 
 router.get('/', getReviews);
 router.get('/:id', getReview);
+router.post('/:id/like', protect, toggleLikeReview);
 
 router.post(
   '/',
