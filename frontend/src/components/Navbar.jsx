@@ -12,18 +12,20 @@ const Navbar = () => {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navLinks = [
+  const isAdminRoute = location.pathname.startsWith('/admin') || (isAuthenticated && user?.role === 'admin');
+
+  const navLinks = isAdminRoute ? [
+    { name: 'Admin Home', path: '/admin' },
+    { name: 'Users', path: '/admin/users' },
+    { name: 'Reviews', path: '/admin/reviews' },
+    { name: 'System Analytics', path: '/admin/analytics' },
+    { name: 'Settings', path: '/admin/settings' },
+  ] : [
     { name: 'Home', path: '/' },
     { name: 'Reviews', path: '/reviews' },
     { name: 'Analytics', path: '/analytics' },
   ];
 
-  if (isAuthenticated) {
-    navLinks.push({ 
-      name: 'Dashboard', 
-      path: user?.role === 'admin' ? '/admin' : '/dashboard' 
-    });
-  }
 
   const handleLogout = () => {
     dispatch(logout());
@@ -73,11 +75,11 @@ const Navbar = () => {
             {isAuthenticated ? (
               <div className="flex items-center gap-4 ml-4 pl-4 border-l border-slate-200 dark:border-slate-700">
                 <Link 
-                  to={user?.role === 'admin' ? '/admin' : '/dashboard'} 
+                  to="/profile" 
                   className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                 >
-                  <LayoutDashboard className="w-4 h-4" />
-                  Dashboard
+                  <UserIcon className="w-4 h-4" />
+                  Profile
                 </Link>
                 <button
                   onClick={handleLogout}
@@ -154,10 +156,10 @@ const Navbar = () => {
                   </div>
                 </div>
                 <Link
-                  to={user?.role === 'admin' ? '/admin' : '/dashboard'}
+                  to="/profile"
                   className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-slate-600 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
                 >
-                  Dashboard
+                  Profile
                 </Link>
                 <button
                   onClick={handleLogout}
