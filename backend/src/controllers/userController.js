@@ -75,8 +75,13 @@ exports.getUsers = asyncHandler(async (req, res) => {
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 10;
 
-  const total = await User.countDocuments();
-  const users = await User.find()
+  const query = {};
+  if (req.query.role) {
+    query.role = req.query.role;
+  }
+
+  const total = await User.countDocuments(query);
+  const users = await User.find(query)
     .skip((page - 1) * limit)
     .limit(limit);
 
@@ -84,7 +89,7 @@ exports.getUsers = asyncHandler(async (req, res) => {
     success: true,
     message: 'Users fetched',
     data: users,
-    pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+    pagination: { page, limit, totalCount: total, totalPages: Math.ceil(total / limit) },
   });
 });
 
