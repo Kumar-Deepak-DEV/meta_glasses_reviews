@@ -22,6 +22,10 @@ const limiter = rateLimit({
 });
 app.use('/api/v1', limiter);
 
+app.get('/', (req, res) => {
+  res.json({ success: true, message: 'Welcome to the Meta Glasses Reviews API' });
+});
+
 app.get('/api/v1/health', (req, res) => {
   res.json({ success: true, message: 'Server is running', timestamp: new Date().toISOString() });
 });
