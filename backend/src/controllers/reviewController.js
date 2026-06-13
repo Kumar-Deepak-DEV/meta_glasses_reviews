@@ -57,3 +57,20 @@ exports.deleteReview = asyncHandler(async (req, res) => {
     data: null,
   });
 });
+
+exports.toggleLikeReview = asyncHandler(async (req, res) => {
+  const { action } = req.body;
+  if (!['like', 'unlike'].includes(action)) {
+    throw new AppError('Invalid action', 400);
+  }
+
+  const review = await reviewService.toggleLikeReview(req.params.id, action);
+  if (!review) {
+    throw new AppError('Review not found', 404);
+  }
+  res.json({
+    success: true,
+    message: 'Review like toggled successfully',
+    data: review,
+  });
+});
